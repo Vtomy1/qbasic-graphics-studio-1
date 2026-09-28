@@ -1,0 +1,6 @@
+{
+  "name": "QBasic Graphics Studio & GIF Header Converter",
+  "description": "Convert images to QBasic Screen modes with 1-bit, 4-bit, and 8-bit quantization, dithering algorithms, interactive GIF header inspection, and production-ready QBasic saver and loader code samples.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
