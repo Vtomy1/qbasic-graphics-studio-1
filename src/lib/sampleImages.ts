@@ -320,5 +320,92 @@ export const SAMPLE_IMAGES: SampleImage[] = [
       ctx.fillStyle = '#D97706';
       ctx.fillRect(kx + 12, ky + 14, 12, 4);
     }
+  },
+  {
+    id: 'dos-waterfall',
+    name: 'DOS Waterfall & Plasma',
+    category: 'Palette Cycling Demo',
+    description: 'Concentric river waves, cascade waterfall, and plasma bands designed for color cycling.',
+    draw: (ctx, w, h) => {
+      // Night mountain landscape with cascading waterfalls & plasma river
+      // Mountain sky
+      const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.45);
+      skyGrad.addColorStop(0, '#09081E');
+      skyGrad.addColorStop(0.7, '#1B143F');
+      skyGrad.addColorStop(1, '#3B1F54');
+      ctx.fillStyle = skyGrad;
+      ctx.fillRect(0, 0, w, h * 0.45);
+
+      // Distant dark jagged peaks
+      ctx.fillStyle = '#100D28';
+      ctx.beginPath();
+      ctx.moveTo(0, h * 0.45);
+      ctx.lineTo(w * 0.15, h * 0.22);
+      ctx.lineTo(w * 0.32, h * 0.38);
+      ctx.lineTo(w * 0.5, h * 0.18);
+      ctx.lineTo(w * 0.68, h * 0.36);
+      ctx.lineTo(w * 0.85, h * 0.2);
+      ctx.lineTo(w, h * 0.45);
+      ctx.closePath();
+      ctx.fill();
+
+      // Middle cliff cliffs
+      ctx.fillStyle = '#1F1A3A';
+      ctx.beginPath();
+      ctx.moveTo(0, h * 0.48);
+      ctx.lineTo(w * 0.35, h * 0.48);
+      ctx.lineTo(w * 0.38, h * 0.62);
+      ctx.lineTo(0, h * 0.62);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(w, h * 0.48);
+      ctx.lineTo(w * 0.65, h * 0.48);
+      ctx.lineTo(w * 0.62, h * 0.62);
+      ctx.lineTo(w, h * 0.62);
+      ctx.closePath();
+      ctx.fill();
+
+      // Waterfall chute in center (w*0.36 to w*0.64)
+      // Vertical ripples
+      const wfLeft = w * 0.36;
+      const wfRight = w * 0.64;
+      const wfTop = h * 0.46;
+      const wfBottom = h * 0.68;
+
+      for (let y = wfTop; y < wfBottom; y += 3) {
+        const t = (y - wfTop) / (wfBottom - wfTop);
+        const wave = Math.sin(y * 0.15) * 120 + 128;
+        ctx.fillStyle = `rgb(${Math.floor(wave * 0.2)}, ${Math.floor(wave * 0.6 + 50)}, ${Math.floor(wave)})`;
+        ctx.fillRect(wfLeft, y, wfRight - wfLeft, 3);
+      }
+
+      // Foreground river / plasma pool with concentric flowing wave bands
+      const poolTop = h * 0.66;
+      for (let y = poolTop; y < h; y += 2) {
+        const ny = (y - poolTop) / (h - poolTop);
+        for (let x = 0; x < w; x += 4) {
+          // Classic 2D demoscene plasma equation
+          const v1 = Math.sin(x * 0.05);
+          const v2 = Math.sin(y * 0.08 + x * 0.02);
+          const v3 = Math.sin(Math.sqrt((x - w * 0.5) ** 2 + (y - poolTop) ** 2) * 0.12);
+          const plasma = (v1 + v2 + v3) / 3; // -1 to 1
+          const norm = (plasma + 1) * 0.5; // 0 to 1
+
+          const r = Math.floor(Math.sin(norm * Math.PI * 2) * 60 + 60);
+          const g = Math.floor(Math.sin(norm * Math.PI * 2 + 2) * 110 + 120);
+          const b = Math.floor(Math.cos(norm * Math.PI * 2) * 100 + 155);
+
+          ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+          ctx.fillRect(x, y, 4, 2);
+        }
+      }
+
+      // Torches / lamps at river banks
+      ctx.fillStyle = '#FFDD55';
+      ctx.fillRect(w * 0.25, poolTop + 10, 8, 8);
+      ctx.fillRect(w * 0.75, poolTop + 10, 8, 8);
+    }
   }
 ];

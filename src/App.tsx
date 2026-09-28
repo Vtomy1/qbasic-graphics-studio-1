@@ -327,14 +327,14 @@ export default function App() {
                   <div>
                     <div className="flex items-center gap-1.5 text-purple-400 font-semibold mb-1">
                       <Layers className="w-3.5 h-3.5" />
-                      <span>VGA DAC Hardware Registers</span>
+                      <span>Palette Cycling & VGA DAC</span>
                     </div>
                     <p className="text-[11px] text-slate-400 font-sans leading-relaxed">
-                      Inspect 6-bit DAC RGB registers (0-63) and copy OUT &amp;H3C8 / &amp;H3C9 statements.
+                      Simulate real-time index shifting (waterfalls, liquid, plasma) &amp; copy DAC rotation routines.
                     </p>
                   </div>
                   <div className="flex items-center gap-1 text-[11px] text-purple-400/80 mt-3 group-hover:text-purple-300">
-                    <span>Inspect Palette</span>
+                    <span>Simulate Palette Cycling</span>
                     <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </button>
@@ -371,6 +371,9 @@ export default function App() {
           <PaletteInspector
             palette={quantizedResult ? quantizedResult.palette : []}
             bitDepth={bitDepth}
+            pixelIndices={quantizedResult ? quantizedResult.pixelIndices : null}
+            width={currentPreset.width}
+            height={currentPreset.height}
           />
         )}
       </main>

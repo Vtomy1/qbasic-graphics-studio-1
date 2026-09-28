@@ -642,3 +642,94 @@ SCREEN 0: WIDTH 80, 25
 END
 `;
 }
+
+// 7. QBasic / QuickBASIC Hardware Palette Cycling (Waterfalls, Plasma, Fire)
+export function generatePaletteCyclingCode(
+  width: number,
+  height: number,
+  bitDepth: BitDepth,
+  rangeStart: number = 0,
+  rangeEnd: number = 15
+): string {
+  const qbScreen = bitDepth === 8 ? 13 : bitDepth === 4 ? 12 : 11;
+  const palCount = bitDepth === 8 ? 256 : bitDepth === 4 ? 16 : 2;
+  const start = Math.min(rangeStart, palCount - 2);
+  const end = Math.min(rangeEnd, palCount - 1);
+
+  return `' ====================================================================
+' QBASIC / QB64 HARDWARE VGA PALETTE CYCLING DEMO
+' Mode: SCREEN ${qbScreen} | Resolution: ${width}x${height}
+' Generates smooth cascading water, fire, plasma, and neon flow effects
+' by rotating VGA DAC hardware registers with ZERO pixel redraws!
+' ====================================================================
+
+DEFINT A-Z
+SCREEN ${qbScreen}
+CLS
+
+' --- Draw Concentric Test Rings / Water Cascade ---
+cx% = ${Math.floor(width / 2)}: cy% = ${Math.floor(height / 2)}
+FOR r% = 120 TO 1 STEP -2
+    col% = ${start} + (r% MOD (${end - start + 1}))
+    CIRCLE (cx%, cy%), r%, col%
+    PAINT (cx%, cy%), col%, col%
+NEXT r%
+
+LOCATE 1, 1: PRINT "Press ESC to stop palette cycling...";
+
+' --- Palette Rotation Range ---
+cycleStart% = ${start}
+cycleEnd%   = ${end}
+cycleCount% = cycleEnd% - cycleStart% + 1
+dir% = 1 ' 1 = Forward (Waterfall flow), -1 = Reverse
+
+' --- Main Real-Time Animation Loop ---
+DO
+    ' Read current VGA DAC values in the range
+    DIM r%(cycleCount%), g%(cycleCount%), b%(cycleCount%)
+    OUT &H3C7, cycleStart% ' Read Index Port
+    FOR i% = 0 TO cycleCount% - 1
+        r%(i%) = INP(&H3C9)
+        g%(i%) = INP(&H3C9)
+        b%(i%) = INP(&H3C9)
+    NEXT i%
+
+    ' Shift palette entries in memory (Circular Ring Buffer)
+    DIM sr%(cycleCount%), sg%(cycleCount%), sb%(cycleCount%)
+    FOR i% = 0 TO cycleCount% - 1
+        IF dir% = 1 THEN
+            src% = (i% - 1 + cycleCount%) MOD cycleCount%
+        ELSE
+            src% = (i% + 1) MOD cycleCount%
+        END IF
+        sr%(i%) = r%(src%)
+        sg%(i%) = g%(src%)
+        sb%(i%) = b%(src%)
+    NEXT i%
+
+    ' Wait for VGA Vertical Retrace (&H3DA) to prevent flicker and tearing
+    WAIT &H3DA, 8
+    WAIT &H3DA, 8, 8
+
+    ' Write shifted RGB entries back to hardware DAC
+    OUT &H3C8, cycleStart% ' Write Index Port
+    FOR i% = 0 TO cycleCount% - 1
+        OUT &H3C9, sr%(i%)
+        OUT &H3C9, sg%(i%)
+        OUT &H3C9, sb%(i%)
+    NEXT i%
+
+    ' Frame rate delay control (~30 FPS)
+    t! = TIMER
+    DO: LOOP WHILE TIMER - t! < 0.03
+
+    k$ = INKEY$
+    IF k$ = CHR$(27) THEN EXIT DO ' ESC exits
+    IF k$ = " " THEN dir% = -dir% ' SPACE toggles direction
+LOOP
+
+SCREEN 0: WIDTH 80, 25
+END
+`;
+}
+

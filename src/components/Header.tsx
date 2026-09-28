@@ -59,7 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
             activeTab === 'palette' ? 'text-amber-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          VGA DAC Palette
+          Palette Cycling & DAC
         </button>
       </nav>
 

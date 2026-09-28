@@ -8,6 +8,7 @@ import {
   generateSelfContainedDataBas,
   generateBinaryLoaderSaverCode,
   generateVramPokeCode,
+  generatePaletteCyclingCode,
   generateBsvFile
 } from '../lib/qbasicGenerators';
 import { createValidGifFile } from '../lib/gifHeader';
@@ -32,7 +33,7 @@ export const CodeExportViewer: React.FC<CodeExportViewerProps> = ({
   quantizedCanvas
 }) => {
   const [activeTab, setActiveTab] = useState<
-    'bload-loader' | 'bsave-saver' | 'gif-loader' | 'data-bas' | 'packed-binary' | 'vram-blit'
+    'bload-loader' | 'bsave-saver' | 'gif-loader' | 'data-bas' | 'packed-binary' | 'vram-blit' | 'palette-cycling'
   >('bload-loader');
 
   const [copied, setCopied] = useState<boolean>(false);
@@ -46,6 +47,13 @@ export const CodeExportViewer: React.FC<CodeExportViewerProps> = ({
     : `' Quantize an image to generate DATA statements`;
   const binaryCode = generateBinaryLoaderSaverCode(width, height, bitDepth);
   const vramCode = generateVramPokeCode(width, height);
+  const paletteCyclingCode = generatePaletteCyclingCode(
+    width,
+    height,
+    bitDepth,
+    0,
+    Math.min(15, palette.length - 1)
+  );
 
   const getActiveCode = () => {
     switch (activeTab) {
@@ -61,6 +69,8 @@ export const CodeExportViewer: React.FC<CodeExportViewerProps> = ({
         return binaryCode;
       case 'vram-blit':
         return vramCode;
+      case 'palette-cycling':
+        return paletteCyclingCode;
       default:
         return bloadCode;
     }
@@ -80,6 +90,8 @@ export const CodeExportViewer: React.FC<CodeExportViewerProps> = ({
         return 'PACKED_SAVER_LOADER.BAS';
       case 'vram-blit':
         return 'VRAM_BLASTER.BAS';
+      case 'palette-cycling':
+        return 'PALETTE_CYCLING.BAS';
     }
   };
 
@@ -269,6 +281,17 @@ export const CodeExportViewer: React.FC<CodeExportViewerProps> = ({
           }`}
         >
           6. VRAM Mode 13h POKE
+        </button>
+
+        <button
+          onClick={() => setActiveTab('palette-cycling')}
+          className={`px-3 py-1.5 rounded transition-colors whitespace-nowrap font-sans flex items-center gap-1.5 ${
+            activeTab === 'palette-cycling'
+              ? 'bg-amber-400 text-slate-950 font-semibold'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <span>7. Palette Cycling SUB</span>
         </button>
       </div>
 
